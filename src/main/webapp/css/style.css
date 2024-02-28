@@ -1,0 +1,100 @@
+.button{
+    width: 160px;
+    height: 24px;
+    text-align: center;
+    background-color: #efefef;
+    border: 1px solid #efefef;
+    border-radius: 5px;
+    margin: 20px 12px;
+}
+
+.input{
+    border:1.6px solid #a8a8a8;
+    height: 1.8em;
+    padding: 2px;
+}
+.selectbox {
+    position: relative;
+}
+/* プルダウンの三角アイコン */
+.selectbox::after {
+  content: '\25BC'; /* 三角形のUnicode文字 */
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  /* 三角のカラー */
+
+  color: #666666; /* 任意の色に変更してください */
+  pointer-events: none; /* 三角形をクリック可能にしない */
+}
+
+.selectbox select {
+    min-width: 180px;
+    height: 1.8em;
+    padding: 2px;
+    border: 1px solid #a8a8a8;
+}
+.radio{
+appearance: revert;
+}
+.a{
+    display: block;
+    margin:30px auto;
+}
+/*-------------------------------------------------------------------------------*/
+.div{
+    margin:40px;
+}
+.linkP{
+    padding:24px;
+}
+.titleP{
+    margin: 24px 0;
+    padding: 24px 0;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+.formBox {
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* 縦方向の中央揃え */
+    flex-direction: column; /* 子要素を縦方向に配置 */
+}
+.textBox{
+    display: flex;
+    justify-content: center;
+    margin: 30px 12px;
+}
+th,td {
+    border: solid 1px #999999;
+    text-align: center;
+    width: 200px;
+    height: 40px;
+}
+
+th{
+    background-color: #efefef;
+    border: 1px solid #999999;
+}
+.updateInput{
+    margin:20px;
+}
+.margin{
+    margin:20px auto;
+    width: 336px;
+    text-align: center;
+}
+.newButton{
+    margin-top: 30px;
+    display: flex;
+}
+.error {
+    display: inline-block;
+    color: red;
+    font-size: 12px;
+    margin-left: 5px; /* 教師番号の入力欄とエラーメッセージの間の余白 */
+}
+

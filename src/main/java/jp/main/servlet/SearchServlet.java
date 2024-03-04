@@ -1,31 +1,24 @@
 package jp.main.servlet;
 
-import com.google.gson.Gson;
-import jp.main.dao.TeacherDAO;
+import com.google.gson.JsonObject;
 import jp.main.model.Teacher;
 import jp.main.service.TeacherService;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
 import java.util.List;
-
 
 public class SearchServlet extends HttpServlet {
     TeacherService teacherService = new TeacherService();
 
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);
     }
@@ -34,9 +27,6 @@ public class SearchServlet extends HttpServlet {
         try {
             request.setCharacterEncoding("UTF-8");
             response.setCharacterEncoding("UTF-8");
-
-            // ログを追加：メソッドが呼び出されたことを確認
-            System.out.println("processRequest メソッドが呼び出されました。");
 
             // 検索条件を取得
             String tid = request.getParameter("tid");
@@ -74,18 +64,11 @@ public class SearchServlet extends HttpServlet {
             request.setAttribute("totalPageNumber", 1);
             request.setAttribute("totalTotalPages", (int) Math.ceil((double) totalItems / itemsPerPage));
 
-            // JSPに転送する前にログを追加：応答を生成する前
-            System.out.println("応答を生成する前");
-
             // JSPに転送
             request.getRequestDispatcher("/teacherL/teacherList.jsp").forward(request, response);
-
-            // JSPに転送した後にログを追加：応答を生成した後
-            System.out.println("応答を生成した後");
 
         } catch (Exception e) {
             throw new ServletException(e);
         }
     }
-
 }

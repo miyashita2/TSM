@@ -3,21 +3,22 @@
 
 <p class="titleP">教師情報</p>
 <div id="errorDisplay"></div> <!-- エラーメッセージを表示する要素 -->
+<div class="all">
 <div class="formBox">
-<form action="/SearchServlet" method="post" class="form searchForm">
-    教師番号：<input type="text" name="tid" size="5" id="tid" class="input">
-    名前：<input type="text" name="tname" size="5" id="tname" class="input">
-    <label for="subject" class="selectbox">
-        コース：<select name="subject" id="subject" class="selectbox">
-            <option value=""></option>
-            <option value="英語">英語</option>
-            <option value="日本語">日本語</option>
-            <option value="数学">数学</option>
-            <option value="中文">中文</option>
-        </select>
-    </label>
-    <input type="submit" value="検索" name="insert" class="button" id="searchButton">
-</form>
+    <form action="/SearchServlet" method="post" class="form searchForm">
+        教師番号：<input type="text" name="tid" size="5" id="tid" class="input">
+        名前：<input type="text" name="tname" size="5" id="tname" class="input">
+        <label for="subject" class="selectbox">
+            コース：<select name="subject" id="subject" class="selectbox">
+                <option value=""></option>
+                <option value="英語">英語</option>
+                <option value="日本語">日本語</option>
+                <option value="数学">数学</option>
+                <option value="中文">中文</option>
+            </select>
+        </label>
+        <input type="submit" value="検索" name="insert" class="button" id="searchButton">
+    </form>
 </div>
 
 <div class= "textBox">
@@ -57,70 +58,56 @@
     </table>
 </div>
 
-    <div class="pagination">
-        <ul class="pageL">
-            <%
-                // ページングの属性を取得
-                Integer pageNumber = (Integer) request.getAttribute("pageNumber");
-                Integer totalPages = (Integer) request.getAttribute("totalPages");
-                if (pageNumber != null && totalPages != null && totalPages > 1) {
-                    for (int i = 1; i <= totalPages; i++) {
-                        if (i == pageNumber) { %>
-                            <li class="pageN"><span><%= i %></span></li>
-                        <% } else { %>
-                            <li class="pageN"><a href="<%= request.getContextPath() %>/SearchServlet?page=<%= i %>"><%= i %></a></li>
-                        <% }
-                    }
+<div class="pagination">
+    <ul class="pageL">
+        <%
+            // ページングの属性を取得
+            Integer pageNumber = (Integer) request.getAttribute("pageNumber");
+            Integer totalPages = (Integer) request.getAttribute("totalPages");
+            if (pageNumber != null && totalPages != null && totalPages > 1) {
+                for (int i = 1; i <= totalPages; i++) {
+                    if (i == pageNumber) { %>
+                        <li class="pageN"><span><%= i %></span></li>
+                    <% } else { %>
+                        <li class="pageN"><a href="#" class="page-link" data-page="<%= i %>"><%= i %></a></li>
+                    <% }
                 }
-            %>
-        </ul>
-    </div>
+            }
+        %>
+    </ul>
+</div>
 
 <a href="../index.jsp" class="button a">トップページへ</a>
-
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    $(".searchForm").on("submit", function(event) {
+    // ページネーションのリンクがクリックされたときの処理
+    $(document).on("click", ".page-link", function(event) {
         event.preventDefault();
+
+        var page = $(this).attr("data-page");
 
         var tid = $("#tid").val();
         var name = $("#tname").val();
         var subject = $("#subject").val();
 
-        // どれか一つでも入力されていれば検索可能とする
-        if (!tid && !name && !subject) {
-            alert("検索条件を入力してください。");
-            return;
-        }
-
-        // 入力チェック
-        if (tid && !/^\d{1,5}$/.test(tid)) {
-            alert("教師番号は1桁以上5桁以下の数字で入力してください。");
-            return;
-        }
-
-        // その他の入力チェック
-        var requestData = { tid: tid, tname: name, subject: subject };
+        var requestData = { tid: tid, tname: name, subject: subject, page: page };
 
         $.ajax({
             url: "/SearchServlet",
             type: "POST",
             data: requestData,
-            dataType: "html", // サーバーからの応答のデータタイプをHTMLに変更
+            dataType: "html",
         })
         .done(function(data) {
-            // 既存のテーブルを置き換える
-            $("#resultTableBody").html(data);
-            console.log(data);
+            $("#all").html(data);
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             console.log("AJAX Request Failed: " + textStatus + ", " + errorThrown);
-            // Handle error gracefully, such as displaying an error message to the user
         });
     });
-
 });
-
 </script>
 
 <%@ include file="../H&F/footerInclude.jsp" %>

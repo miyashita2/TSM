@@ -25,9 +25,22 @@ public class UpdateServlet extends HttpServlet {
             request.setCharacterEncoding("UTF-8");
             response.setCharacterEncoding("UTF-8");
 
+            // 変更前の値をデータベースから取得
+            int tid = Integer.parseInt(request.getParameter("tid"));
+            List<Teacher> teacherList = teacherService.getTeachers(tid);
+            request.setAttribute("teacherList", teacherList);
+            request.setAttribute("teacherList", teacherList);
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/teacherL/teacherUpdate.jsp");
+            dispatcher.forward(request, response);
+
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ServletException e) {
             throw new RuntimeException(e);
         }
     }

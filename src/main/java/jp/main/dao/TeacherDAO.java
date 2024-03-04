@@ -48,10 +48,10 @@ public class TeacherDAO {
     }
 
     //先生全件取得
-    public List<Teacher> getTeachers() throws SQLException {
+    public List<Teacher> getTeachers(int tid) throws SQLException {
         List<Teacher> teacherList = new ArrayList<>(); // Teacherオブジェクトのリストを作成
 
-        String sql = "SELECT * FROM teachers ";
+        String sql = "SELECT * FROM teachers WHERE id = "+ tid;
         ResultSet res = JdbcTest.executeQuery(sql);
         while (res.next()) {
             int id = res.getInt("id");

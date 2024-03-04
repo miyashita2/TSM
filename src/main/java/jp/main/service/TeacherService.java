@@ -10,8 +10,8 @@ public class TeacherService {
 
     TeacherDAO dao = new TeacherDAO();
 
-    public List<Teacher> getTeachers() throws SQLException {
-        return dao.getTeachers();
+    public List<Teacher> getTeachers(int tid) throws SQLException {
+        return dao.getTeachers(tid);
     }
     public Teacher getTeacher(int tid) throws SQLException {
         return dao.getTeacher(tid);

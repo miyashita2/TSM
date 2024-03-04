@@ -97,4 +97,13 @@ th{
     font-size: 12px;
     margin-left: 5px; /* 教師番号の入力欄とエラーメッセージの間の余白 */
 }
-
+.pageL{
+    display: flex;
+    font-size: larger;
+    justify-content: center;
+}
+.pageN{
+    padding: 10px;
+    margin: 4px;
+    background-color: #efefef;
+}

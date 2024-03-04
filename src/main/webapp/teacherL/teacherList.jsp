@@ -34,9 +34,9 @@
         </thead>
         <tbody id="resultTableBody">
             <!-- ここに検索結果が表示されます -->
-            <% List<Teacher> teacherList = (List<Teacher>) request.getAttribute("teacherList");
-               if (teacherList != null) {
-                   for (Teacher teacher : teacherList) {
+            <% List<Teacher> itemList = (List<Teacher>) request.getAttribute("itemList");
+               if (itemList != null) {
+                   for (Teacher teacher : itemList) {
             %>
             <tr>
                 <td><%= teacher.getId() %></td>
@@ -56,78 +56,71 @@
         </tbody>
     </table>
 </div>
+
+    <div class="pagination">
+        <ul class="pageL">
+            <%
+                // ページングの属性を取得
+                Integer pageNumber = (Integer) request.getAttribute("pageNumber");
+                Integer totalPages = (Integer) request.getAttribute("totalPages");
+                if (pageNumber != null && totalPages != null && totalPages > 1) {
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == pageNumber) { %>
+                            <li class="pageN"><span><%= i %></span></li>
+                        <% } else { %>
+                            <li class="pageN"><a href="<%= request.getContextPath() %>/SearchServlet?page=<%= i %>"><%= i %></a></li>
+                        <% }
+                    }
+                }
+            %>
+        </ul>
+    </div>
+
 <a href="../index.jsp" class="button a">トップページへ</a>
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        $(".searchForm").on("submit", function(event) {
-            event.preventDefault();
+$(document).ready(function() {
+    $(".searchForm").on("submit", function(event) {
+        event.preventDefault();
 
-            var tid = $("#tid").val();
-            var name = $("#tname").val();
-            var subject = $("#subject").val();
-            // 入力チェック
-            if (/^\d{6,}$/.test(tid)) {
-                alert("教師番号は5桁以下の数字で入力してください。");
-                return;
-            }
+        var tid = $("#tid").val();
+        var name = $("#tname").val();
+        var subject = $("#subject").val();
 
-            // その他の入力チェック
-            var requestData = { tid: tid, name: name, subject: subject };
+        // どれか一つでも入力されていれば検索可能とする
+        if (!tid && !name && !subject) {
+            alert("検索条件を入力してください。");
+            return;
+        }
 
-            $.ajax({
-                url: "/SearchServlet",
-                type: "POST",
-                data: requestData,
-                dataType: "json"
-            })
-            .done(function(data) {
-                if (data.error) {
-                    $("#errorDisplay").html("<p style='color: red;'>" + data.error + "</p>");
-                    $("#resultTableBody").empty();
-                } else {
-                    $("#errorDisplay").empty();
-                    updateTable(data);
-                }
-            });
+        // 入力チェック
+        if (tid && !/^\d{1,5}$/.test(tid)) {
+            alert("教師番号は1桁以上5桁以下の数字で入力してください。");
+            return;
+        }
+
+        // その他の入力チェック
+        var requestData = { tid: tid, tname: name, subject: subject };
+
+        $.ajax({
+            url: "/SearchServlet",
+            type: "POST",
+            data: requestData,
+            dataType: "html", // サーバーからの応答のデータタイプをHTMLに変更
+        })
+        .done(function(data) {
+            // 既存のテーブルを置き換える
+            $("#resultTableBody").html(data);
+            console.log(data);
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            console.log("AJAX Request Failed: " + textStatus + ", " + errorThrown);
+            // Handle error gracefully, such as displaying an error message to the user
         });
     });
 
-function updateTable(data) {
-    var tableBody = $("#resultTableBody");
-    tableBody.empty();
+});
 
-    if (data.error) {
-        $("#errorDisplay").html("<p style='color: red;'>" + data.error + "</p>");
-    } else {
-        // dataが配列であるかどうかをチェックする
-        if (Array.isArray(data)) {
-            // dataが配列の場合、各要素を処理する
-            if (data.length > 0) {
-                $.each(data, function(index, item) {
-                    var row = $("<tr>");
-                    row.append($("<td>").text(item.tid));
-                    row.append($("<td>").text(item.name));
-                    row.append($("<td>").text(item.sex));
-                    row.append($("<td>").text(item.age));
-                    row.append($("<td>").text(item.subject));
-                    row.append("<td><form action='UpdateServlet' method='get'><input type='hidden' name='tid' value='" + item.tid + "'><input type='submit' value='変更' class='button' name='update'></form></td>");
-                    tableBody.append(row);
-                });
-            } else {
-                var row = $("<tr>");
-                var msg = "該当する教師が見つかりません。";
-                var colspan = 6; // 6つ分の長さを指定
-                // 1つのセルを作成し、colspan属性を設定して6つのセル分の幅に広げる
-                var cell = $("<td>").attr("colspan", colspan).text(msg);
-                // セルを行に追加
-                row.append(cell);
-
-                tableBody.append(row);
-            }
-        }
-    }
-}
 </script>
 
 <%@ include file="../H&F/footerInclude.jsp" %>

@@ -20,75 +20,71 @@ import java.util.List;
 public class SearchServlet extends HttpServlet {
     TeacherService teacherService = new TeacherService();
 
-
-    // 空のServlet
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            // 文字コードを設定する
-            request.setCharacterEncoding("UTF-8");
-            response.setCharacterEncoding("UTF-8");
-
-            List<Teacher> teacherList = teacherService.getTeachers();
-
-            request.setAttribute("teacherList", teacherList); // リストをリクエスト属性に設定
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/teacherL/teacherList.jsp"); // JSPページのディスパッチャーを取得
-            dispatcher.forward(request, response); // リクエストをJSPページに転送
-
-            // 画面に表示する
-            response.setContentType("text/html; charset=UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ServletException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        processRequest(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
-        // POSTメソッドの処理
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            // 文字コードを設定する
             request.setCharacterEncoding("UTF-8");
             response.setCharacterEncoding("UTF-8");
 
+            // ログを追加：メソッドが呼び出されたことを確認
+            System.out.println("processRequest メソッドが呼び出されました。");
 
+            // 検索条件を取得
             String tid = request.getParameter("tid");
-            tid = (tid == null || tid.isEmpty()) ? null : tid;
-            String name = request.getParameter("name");
-            name = (name == null || name.isEmpty()) ? null : name;
+            String name = request.getParameter("tname");
             String subject = request.getParameter("subject");
-            subject = (subject == null || subject.isEmpty()) ? null : subject;
-            // データがある場合は、DAOメソッドにデータを渡して処理を実行
-            // データがない場合は、nullを渡す
 
-            List<Teacher> teacherList = teacherService.search(tid, name, subject);
-            if(teacherList != null){
-                response.setContentType("application/json");
-                Gson gson = new Gson();
-                String json = gson.toJson(teacherList);
-                PrintWriter out = response.getWriter();
-                out.print(json);
-                out.flush();
-            }else{
-                String error = "error";
-                response.setContentType("application/json");
-                Gson gson = new Gson();
-                String json = gson.toJson(error);
-                PrintWriter out = response.getWriter();
-                out.print(json);
-                out.flush();
+            // ページングのためのパラメータを取得
+            String pageParameter = request.getParameter("page");
+            int pageNumber = 1;
+            if (pageParameter != null && !pageParameter.isEmpty()) {
+                pageNumber = Integer.parseInt(pageParameter);
             }
+            int itemsPerPage = 10;
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            // 検索を実行し、結果を取得
+            List<Teacher> searchResult = teacherService.search(tid, name, subject);
+
+            // 検索結果の総数を取得
+            int totalItems = searchResult.size();
+
+            // 開始インデックスを計算
+            int startIndex = (pageNumber - 1) * itemsPerPage;
+            // 終了インデックスを計算
+            int endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+            // 現在のページの教師リストを取得
+            List<Teacher> currentPageTeachers = searchResult.subList(startIndex, endIndex);
+
+            // ページング用の属性を設定
+            request.setAttribute("itemList", currentPageTeachers);
+            request.setAttribute("pageNumber", pageNumber);
+            request.setAttribute("totalPages", (int) Math.ceil((double) totalItems / itemsPerPage));
+
+            // 全件表示のパラメータを設定
+            request.setAttribute("totalPageNumber", 1);
+            request.setAttribute("totalTotalPages", (int) Math.ceil((double) totalItems / itemsPerPage));
+
+            // JSPに転送する前にログを追加：応答を生成する前
+            System.out.println("応答を生成する前");
+
+            // JSPに転送
+            request.getRequestDispatcher("/teacherL/teacherList.jsp").forward(request, response);
+
+            // JSPに転送した後にログを追加：応答を生成した後
+            System.out.println("応答を生成した後");
+
+        } catch (Exception e) {
+            throw new ServletException(e);
         }
     }
 

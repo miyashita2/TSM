@@ -13,20 +13,19 @@ public class TeacherDAO {
     public List<Teacher> search(String tid, String name, String subject) throws SQLException {
         List<Teacher> searchList = new ArrayList<>(); // Teacherオブジェクトのリストを作成
 
-        String sql = "SELECT * FROM teachers WHERE 1=1";
+        String sql = "SELECT * FROM teachers WHERE 1=1 ";
         // 入力されたデータがある場合のみ条件を追加
-        if (tid != null) {
-            sql += " AND id = " + tid;
+        if (tid != null && !tid.isEmpty()) {
+            sql += " AND id = '" + tid + "'";
         }
         if (name != null && !name.isEmpty()) {
-            // シングルクォートで値を囲む
-            sql += " AND tname LIKE '" + name + "'";
+            // シングルクォートをエスケープして追加
+            sql += " AND tname LIKE '%" + name.replace("'", "''") + "%'";
         }
         if (subject != null && !subject.isEmpty()) {
-            // シングルクォートで値を囲む
-            sql += " AND subject = '" + subject + "'";
+            // シングルクォートをエスケープして追加
+            sql += " AND subject = '" + subject.replace("'", "''") + "'";
         }
-
         ResultSet res = JdbcTest.executeQuery(sql);
 
         while (res.next()) { // 検索結果が存在する場合
@@ -46,9 +45,7 @@ public class TeacherDAO {
             searchList.add(te); // リストにTeacherオブジェクトを追加
         }
         return searchList; // Teacherオブジェクトのリストを返す
-
     }
-
 
     //先生全件取得
     public List<Teacher> getTeachers() throws SQLException {

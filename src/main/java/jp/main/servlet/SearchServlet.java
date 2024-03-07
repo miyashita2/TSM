@@ -1,5 +1,6 @@
 package jp.main.servlet;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import jp.main.model.Teacher;
 import jp.main.service.TeacherService;
@@ -55,20 +56,32 @@ public class SearchServlet extends HttpServlet {
             // 現在のページの教師リストを取得
             List<Teacher> currentPageTeachers = searchResult.subList(startIndex, endIndex);
 
-            // ページング用の属性を設定
-            request.setAttribute("itemList", currentPageTeachers);
-            request.setAttribute("pageNumber", pageNumber);
-            request.setAttribute("totalPages", (int) Math.ceil((double) totalItems / itemsPerPage));
+            if (request.getMethod().equalsIgnoreCase("GET")) {
+                // ページング用の属性を設定
+                request.setAttribute("itemList", currentPageTeachers);
+                request.setAttribute("pageNumber", pageNumber);
+                request.setAttribute("totalPages", (int) Math.ceil((double) totalItems / itemsPerPage));
 
-            // 全件表示のパラメータを設定
-            request.setAttribute("totalPageNumber", 1);
-            request.setAttribute("totalTotalPages", (int) Math.ceil((double) totalItems / itemsPerPage));
+                // 全件表示のパラメータを設定
+                request.setAttribute("totalPageNumber", 1);
+                request.setAttribute("totalTotalPages", (int) Math.ceil((double) totalItems / itemsPerPage));
 
-            // JSPに転送
-            request.getRequestDispatcher("/teacherL/teacherList.jsp").forward(request, response);
+                // JSPに転送
+                request.getRequestDispatcher("/teacherL/teacherList.jsp").forward(request, response);
+            } else if (request.getMethod().equalsIgnoreCase("POST")) {
+                // Gsonを使用してJSON形式でデータを作成
+                Gson gson = new Gson();
+                String jsonTeachers = gson.toJson(currentPageTeachers);
+                String jsonResponse = "{\"teachers\":" + jsonTeachers + ",\"pageNumber\":" + pageNumber + ",\"totalPages\":" + (int) Math.ceil((double) totalItems / itemsPerPage) + ",\"totalItems\":" + totalItems + "}";
 
+                // レスポンスにJSONデータを設定
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(jsonResponse);
+            }
         } catch (Exception e) {
             throw new ServletException(e);
         }
     }
+
 }
